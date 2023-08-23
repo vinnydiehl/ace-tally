@@ -13,14 +13,9 @@ const DECKS = 6;
 export default function App() {
   // @ts-ignore unused declaration
   const [deck, setDeck] = useState(newDeck(DECKS));
-
-  // @ts-ignore unused declaration
-  const [cardsInPlay, setCardsInPlay] = useState(0);
   const [discarded, setDiscarded] = useState(0);
 
-  // @ts-ignore unused declaration
   const [dealerCards, setDealerCards] = useState([]);
-  // @ts-ignore unused declaration
   const [holeCard, setHoleCard] = useState();
   const [cards, setCards] = useState<string[]>([]);
 
@@ -79,8 +74,17 @@ export default function App() {
     });
   }
 
-  function discard(numCards: number) {
-    setDiscarded((curDiscarded: number): number => curDiscarded + numCards);
+  function clearTable() {
+    let cardsInPlay = cards.length + dealerCards.length;
+    if (holeCard) {
+      ++cardsInPlay;
+    }
+
+    setCards([]);
+    setDealerCards([]);
+    setHoleCard(undefined);
+
+    setDiscarded((curDiscarded: number): number => curDiscarded + cardsInPlay);
   }
 
   return (
@@ -119,7 +123,7 @@ export default function App() {
       </div>
 
       <button onClick={hit}>Hit</button>
-      <button onClick={() => discard(1)}>Discard</button>
+      <button onClick={clearTable}>Clear Table</button>
     </>
   );
 }
