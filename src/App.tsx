@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import Hand from "./Hand";
 import "./App.css"
+import score from "./score";
 
 const DECKS = 6;
 
@@ -27,8 +28,7 @@ export default function App() {
   const [dealerHand, setDealerHand] = useState<string[]>([]);
   const [hand, setHand] = useState<string[]>([]);
 
-  const [userTurn, setUserTurn] = useState(false);
-  // @ts-ignore unused declaration
+  const [playerTurn, setPlayerTurn] = useState(false);
   const [message, setMessage] = useState(Message.none);
 
   function newDeck(decks: number): string[] {
@@ -64,10 +64,12 @@ export default function App() {
 
     switch (dealTo) {
      case DealTo.player:
-      setHand((curHand: string[]): string[] => [...curHand, card]);
+      hand.push(card);
+      setHand(hand);
       break;
      case DealTo.dealer:
-      setDealerHand((curHand: string[]): string[] => [...curHand, card]);
+      dealerHand.push(card);
+      setDealerHand(dealerHand);
       break;
      case DealTo.hole:
       setHoleCard(card);
@@ -81,8 +83,10 @@ export default function App() {
       ++cardsInPlay;
     }
 
-    setHand([]);
-    setDealerHand([]);
+    hand.splice(0, hand.length);
+    setHand(hand);
+    dealerHand.splice(0, dealerHand.length);
+    setDealerHand(dealerHand);
     setHoleCard(undefined);
 
     setDiscarded((curDiscarded: number): number => curDiscarded + cardsInPlay);
@@ -97,7 +101,8 @@ export default function App() {
   }
 
   function newHand() {
-    setUserTurn(true);
+    setMessage(Message.none);
+    setPlayerTurn(true);
     clearTable();
 
     dealCard(DealTo.dealer);
@@ -111,16 +116,38 @@ export default function App() {
   function hit() {
     dealCard(DealTo.player);
 
-    // TODO: Check bust
+    const s = score(hand);
+
+    if (s.value == 21) {
+      playDealerTurn();
+    } else if (s.value > 21) {
+      setMessage(Message.bust);
+      setPlayerTurn(false);
+    }
   }
 
-  function stand() {
-    setUserTurn(false);
+  function playDealerTurn() {
+    setPlayerTurn(false);
     setDealerHand((curHand: string[]): string[] => [...curHand, holeCard!]);
     setHoleCard(undefined);
 
-    // TODO: Initiate dealer's turn
+    let s = score(dealerHand);
+    for (; s.value <= 17; s = score(dealerHand)) {
+      dealCard(DealTo.dealer);
+    }
+
+    const dealerScore = s.value;
+    const playerScore = score(hand).value;
+    if (playerScore > dealerScore) {
+      setMessage(Message.playerWin);
+    } else if (dealerScore > playerScore) {
+      setMessage(Message.dealerWin);
+    } else {
+      setMessage(Message.push);
+    }
   }
+
+  const stand = playDealerTurn;
 
   return (
     <>
@@ -138,8 +165,8 @@ export default function App() {
 
       <div className="btn-container">
         <div className="btn-row">
-          <button onClick={hit} disabled={!userTurn}>Hit</button>
-          <button onClick={stand} disabled={!userTurn}>Stand</button>
+          <button onClick={hit} disabled={!playerTurn}>Hit</button>
+          <button onClick={stand} disabled={!playerTurn}>Stand</button>
           <button disabled>Double</button>
           <button disabled>Split</button>
         </div>
