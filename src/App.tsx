@@ -123,7 +123,7 @@ export default function App() {
       }
 
       setPlayerTurn(false);
-    } else if (score([...dealerHand, holeCard!]).value == 21) {
+    } else if (score([...dealerHand, holeCard]).value == 21) {
       // Dealer blackjack
       revealHoleCard();
       setMessage(Message.dealerWin);
@@ -145,7 +145,8 @@ export default function App() {
   }
 
   function revealHoleCard() {
-    dealerHand.push(holeCard!);
+    dealerHand.push(holeCard);
+    setDealerHand(dealerHand);
     setHoleCard("");
   }
 
