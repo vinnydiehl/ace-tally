@@ -126,8 +126,13 @@ export default function App() {
         })}
       </div>
 
-      <button onClick={hit}>Hit</button>
-      <button onClick={clearTable}>Clear Table</button>
+      <div className="btn-container">
+        <div className="btn-row"><button onClick={hit}>Hit</button></div>
+        <div className="btn-row">
+          <button onClick={clearTable}>Clear Table</button>
+          <button onClick={shuffle}>Shuffle</button>
+        </div>
+      </div>
     </>
   );
 }
