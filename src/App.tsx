@@ -87,6 +87,7 @@ export default function App() {
   }
 
   function shuffle() {
+    clearTable();
     setDeck(newDeck(DECKS));
     setDiscarded(0);
   }
