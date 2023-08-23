@@ -1,12 +1,7 @@
-import { ReactNode, useState } from "react";
-import "./App.css"
+import { useState } from "react";
 
-/**
- * Generates the absolute path for a file in the `public/` directory.
- */
-function publicUrl(url: string): string {
-  return `${import.meta.env.BASE_URL}${url}`;
-}
+import Hand from "./Hand";
+import "./App.css"
 
 const DECKS = 6;
 
@@ -38,24 +33,6 @@ export default function App() {
     }
 
     return deck;
-  }
-
-  function cardAltText(card: string): string {
-    const ranks: { [key: string]: string } = {
-      X: "10",
-      J: "Jack",
-      Q: "Queen",
-      K: "King",
-    }
-
-    const suits: { [key: string]: string } = {
-      S: "Spades",
-      D: "Diamonds",
-      C: "Clubs",
-      H: "Hearts",
-    }
-
-    return `${ranks[card[0]] || card[0]} of ${suits[card[1]]}`;
   }
 
   function drawCard(callback: (card: string | undefined) => void) {
@@ -94,19 +71,6 @@ export default function App() {
 
   return (
     <>
-      <div id="dealer" className="cards">
-        {dealerCards.map((card: string, i: number): ReactNode => {
-          return (
-            <img
-              className="card"
-              src={publicUrl(`cards/${card}.png`)}
-              alt={cardAltText(card)}
-              key={i}
-            />
-          );
-        })}
-      </div>
-
       <div id="discard-tray">
         <div
           id="discard-pile"
@@ -114,18 +78,8 @@ export default function App() {
         ></div>
       </div>
 
-      <div id="player" className="cards">
-        {cards.map((card: string, i: number): ReactNode => {
-          return (
-            <img
-              className="card"
-              src={publicUrl(`cards/${card}.png`)}
-              alt={cardAltText(card)}
-              key={i}
-            />
-          );
-        })}
-      </div>
+      <Hand id="dealer" cards={dealerCards} />
+      <Hand id="player" cards={cards} />
 
       <div className="btn-container">
         <div className="btn-row"><button onClick={hit}>Hit</button></div>
