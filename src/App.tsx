@@ -1,6 +1,13 @@
 import { ReactNode, useState } from "react";
 import "./App.css"
 
+/**
+ * Generates the absolute path for a file in the `public/` directory.
+ */
+function publicUrl(url: string): string {
+  return `${import.meta.env.BASE_URL}${url}`;
+}
+
 const DECKS = 6;
 
 export default function App() {
@@ -83,7 +90,7 @@ export default function App() {
           return (
             <img
               className="card"
-              src={`/cards/${card}.png`}
+              src={publicUrl(`cards/${card}.png`)}
               alt={cardAltText(card)}
               key={i}
             />
@@ -103,7 +110,7 @@ export default function App() {
           return (
             <img
               className="card"
-              src={`/cards/${card}.png`}
+              src={publicUrl(`cards/${card}.png`)}
               alt={cardAltText(card)}
               key={i}
             />
