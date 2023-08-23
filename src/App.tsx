@@ -19,6 +19,8 @@ export default function App() {
   const [dealerHand, setDealerHand] = useState<string[]>([]);
   const [hand, setHand] = useState<string[]>([]);
 
+  const [userTurn, setUserTurn] = useState(false);
+
   function newDeck(decks: number): string[] {
     const values = "23456789XJQKA";
     const suits = "SDCH";
@@ -85,12 +87,23 @@ export default function App() {
   }
 
   function newHand() {
+    setUserTurn(true);
     clearTable();
 
     dealCard(DealTo.dealer);
     dealCard(DealTo.hole);
     dealCard(DealTo.player);
     dealCard(DealTo.player);
+
+    // TODO: Check blackjack
+  }
+
+  function stand() {
+    setUserTurn(false);
+    setDealerHand((curHand: string[]): string[] => [...curHand, holeCard!]);
+    setHoleCard(undefined);
+
+    // TODO: Initiate dealer's turn
   }
 
   return (
@@ -107,7 +120,8 @@ export default function App() {
 
       <div className="btn-container">
         <div className="btn-row">
-          <button onClick={() => dealCard(DealTo.player)}>Hit</button>
+          <button onClick={() => dealCard(DealTo.player)} disabled={!userTurn}>Hit</button>
+          <button onClick={stand} disabled={!userTurn}>Stand</button>
         </div>
         <div className="btn-row">
           <button onClick={newHand}>New Hand</button>
