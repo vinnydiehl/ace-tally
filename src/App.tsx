@@ -11,6 +11,14 @@ enum DealTo {
   hole,
 }
 
+enum Message {
+  none = "",
+  bust = "Bust!",
+  playerWin = "You win!",
+  dealerWin = "Dealer wins!",
+  push = "Push.",
+}
+
 export default function App() {
   const [deck, setDeck] = useState(newDeck(DECKS));
   const [discarded, setDiscarded] = useState(0);
@@ -20,6 +28,8 @@ export default function App() {
   const [hand, setHand] = useState<string[]>([]);
 
   const [userTurn, setUserTurn] = useState(false);
+  // @ts-ignore unused declaration
+  const [message, setMessage] = useState(Message.none);
 
   function newDeck(decks: number): string[] {
     const values = "23456789XJQKA";
@@ -98,6 +108,12 @@ export default function App() {
     // TODO: Check blackjack
   }
 
+  function hit() {
+    dealCard(DealTo.player);
+
+    // TODO: Check bust
+  }
+
   function stand() {
     setUserTurn(false);
     setDealerHand((curHand: string[]): string[] => [...curHand, holeCard!]);
@@ -108,6 +124,8 @@ export default function App() {
 
   return (
     <>
+      <Hand id="dealer" cards={dealerHand} />
+
       <div id="discard-tray">
         <div
           id="discard-pile"
@@ -115,13 +133,15 @@ export default function App() {
         ></div>
       </div>
 
-      <Hand id="dealer" cards={dealerHand} />
+      <div id="message">{message}</div>
       <Hand id="player" cards={hand} />
 
       <div className="btn-container">
         <div className="btn-row">
-          <button onClick={() => dealCard(DealTo.player)} disabled={!userTurn}>Hit</button>
+          <button onClick={hit} disabled={!userTurn}>Hit</button>
           <button onClick={stand} disabled={!userTurn}>Stand</button>
+          <button disabled>Double</button>
+          <button disabled>Split</button>
         </div>
         <div className="btn-row">
           <button onClick={newHand}>New Hand</button>

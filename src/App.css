@@ -16,6 +16,13 @@
   }
 }
 
+#message {
+  text-align: center;
+  height: 2em;
+  font-size: 2em;
+  color: white;
+}
+
 .cards {
   border: 1px solid white;
   width: 100%;
