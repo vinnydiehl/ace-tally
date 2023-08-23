@@ -5,13 +5,19 @@ import "./App.css"
 
 const DECKS = 6;
 
+enum DealTo {
+  player,
+  dealer,
+  hole,
+}
+
 export default function App() {
-  const [_, setDeck] = useState(newDeck(DECKS));
+  const [deck, setDeck] = useState(newDeck(DECKS));
   const [discarded, setDiscarded] = useState(0);
 
-  const [dealerCards, setDealerCards] = useState([]);
-  const [holeCard, setHoleCard] = useState();
-  const [cards, setCards] = useState<string[]>([]);
+  const [holeCard, setHoleCard] = useState<string>();
+  const [dealerHand, setDealerHand] = useState<string[]>([]);
+  const [hand, setHand] = useState<string[]>([]);
 
   function newDeck(decks: number): string[] {
     const values = "23456789XJQKA";
@@ -26,47 +32,65 @@ export default function App() {
       }
     }
 
-    // Shuffle using the Fisher-Yates algorithm
-    for (let i = deck.length - 1; i > 0; --i) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-
     return deck;
   }
 
-  function drawCard(callback: (card: string | undefined) => void) {
-    setDeck((curDeck: string[]): string[] => {
-      callback(curDeck[curDeck.length - 1]);
-      return curDeck.slice(0, -1);
-    });
-  }
+  function dealCard(dealTo: DealTo) {
+    if (deck.length < 1) {
+      alert("All cards have been drawn; shuffling.");
+      shuffle();
+      return;
+    }
 
-  function hit() {
-    drawCard((card: string | undefined) => {
-      if (card) {
-        setCards([...cards, card]);
-      }
-    });
+    // Rather than shuffling the cards when creating a new deck,
+    // we draw from the deck using a random index. This prevents
+    // cheating by peeking at the `deck` array in the debugger.
+    const randomIndex = Math.floor(Math.random() * deck.length);
+    const card = deck[randomIndex];
+    deck.splice(randomIndex, 1);
+    setDeck([...deck]);
+
+    switch (dealTo) {
+     case DealTo.player:
+      setHand((curHand: string[]): string[] => [...curHand, card]);
+      break;
+     case DealTo.dealer:
+      setDealerHand((curHand: string[]): string[] => [...curHand, card]);
+      break;
+     case DealTo.hole:
+      setHoleCard(card);
+      break;
+    }
   }
 
   function clearTable() {
-    let cardsInPlay = cards.length + dealerCards.length;
+    let cardsInPlay = hand.length + dealerHand.length;
     if (holeCard) {
       ++cardsInPlay;
     }
 
-    setCards([]);
-    setDealerCards([]);
+    setHand([]);
+    setDealerHand([]);
     setHoleCard(undefined);
 
     setDiscarded((curDiscarded: number): number => curDiscarded + cardsInPlay);
   }
 
   function shuffle() {
-    clearTable();
     setDeck(newDeck(DECKS));
+    newHand();
+    // Dealing a new hand clears the table, but we still need to clear the
+    // discard tray
     setDiscarded(0);
+  }
+
+  function newHand() {
+    clearTable();
+
+    dealCard(DealTo.dealer);
+    dealCard(DealTo.hole);
+    dealCard(DealTo.player);
+    dealCard(DealTo.player);
   }
 
   return (
@@ -78,13 +102,15 @@ export default function App() {
         ></div>
       </div>
 
-      <Hand id="dealer" cards={dealerCards} />
-      <Hand id="player" cards={cards} />
+      <Hand id="dealer" cards={dealerHand} />
+      <Hand id="player" cards={hand} />
 
       <div className="btn-container">
-        <div className="btn-row"><button onClick={hit}>Hit</button></div>
         <div className="btn-row">
-          <button onClick={clearTable}>Clear Table</button>
+          <button onClick={() => dealCard(DealTo.player)}>Hit</button>
+        </div>
+        <div className="btn-row">
+          <button onClick={newHand}>New Hand</button>
           <button onClick={shuffle}>Shuffle</button>
         </div>
       </div>
