@@ -44,6 +44,12 @@ export default function App() {
       }
     }
 
+    // Shuffle using the Fisher-Yates algorithm
+    for (let i = deck.length - 1; i > 0; --i) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+
     return deck;
   }
 
@@ -54,12 +60,7 @@ export default function App() {
       return;
     }
 
-    // Rather than shuffling the cards when creating a new deck,
-    // we draw from the deck using a random index. This prevents
-    // cheating by peeking at the `deck` array in the debugger.
-    const randomIndex = Math.floor(Math.random() * deck.length);
-    const card = deck[randomIndex];
-    deck.splice(randomIndex, 1);
+    const card = deck.splice(0, 1)[0];
     setDeck([...deck]);
 
     switch (dealTo) {
