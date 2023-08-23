@@ -11,8 +11,7 @@ function publicUrl(url: string): string {
 const DECKS = 6;
 
 export default function App() {
-  // @ts-ignore unused declaration
-  const [deck, setDeck] = useState(newDeck(DECKS));
+  const [_, setDeck] = useState(newDeck(DECKS));
   const [discarded, setDiscarded] = useState(0);
 
   const [dealerCards, setDealerCards] = useState([]);
@@ -85,6 +84,11 @@ export default function App() {
     setHoleCard(undefined);
 
     setDiscarded((curDiscarded: number): number => curDiscarded + cardsInPlay);
+  }
+
+  function shuffle() {
+    setDeck(newDeck(DECKS));
+    setDiscarded(0);
   }
 
   return (
