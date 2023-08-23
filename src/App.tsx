@@ -18,13 +18,14 @@ enum Message {
   playerWin = "You win!",
   dealerWin = "Dealer wins!",
   push = "Push.",
+  blackjack = "Blackjack!",
 }
 
 export default function App() {
   const [deck, setDeck] = useState(newDeck(DECKS));
   const [discarded, setDiscarded] = useState(0);
 
-  const [holeCard, setHoleCard] = useState<string>();
+  const [holeCard, setHoleCard] = useState<string>("");
   const [dealerHand, setDealerHand] = useState<string[]>([]);
   const [hand, setHand] = useState<string[]>([]);
 
@@ -73,6 +74,7 @@ export default function App() {
       setDealerHand(dealerHand);
       break;
      case DealTo.hole:
+      holeCard.replace(holeCard, card);
       setHoleCard(card);
       break;
     }
@@ -88,7 +90,7 @@ export default function App() {
     setHand(hand);
     dealerHand.splice(0, dealerHand.length);
     setDealerHand(dealerHand);
-    setHoleCard(undefined);
+    setHoleCard("");
 
     setDiscarded((curDiscarded: number): number => curDiscarded + cardsInPlay);
   }
@@ -111,7 +113,22 @@ export default function App() {
     dealCard(DealTo.player);
     dealCard(DealTo.player);
 
-    // TODO: Check blackjack
+    if (score(hand).value == 21) {
+      // Player blackjack
+      revealHoleCard();
+      if (score(dealerHand).value == 21) {
+        setMessage(Message.push);
+      } else {
+        setMessage(Message.blackjack);
+      }
+
+      setPlayerTurn(false);
+    } else if (score([...dealerHand, holeCard!]).value == 21) {
+      // Dealer blackjack
+      revealHoleCard();
+      setMessage(Message.dealerWin);
+      setPlayerTurn(false);
+    }
   }
 
   function hit() {
@@ -127,10 +144,14 @@ export default function App() {
     }
   }
 
+  function revealHoleCard() {
+    dealerHand.push(holeCard!);
+    setHoleCard("");
+  }
+
   function playDealerTurn() {
     setPlayerTurn(false);
-    setDealerHand((curHand: string[]): string[] => [...curHand, holeCard!]);
-    setHoleCard(undefined);
+    revealHoleCard();
 
     let s = score(dealerHand);
     for (; s.value <= 17; s = score(dealerHand)) {
