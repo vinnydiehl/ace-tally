@@ -161,7 +161,7 @@ export default function App() {
 
     const dealerScore = s.value;
     const playerScore = score(hand).value;
-    if (playerScore > dealerScore) {
+    if (playerScore > dealerScore || dealerScore > 21) {
       setMessage(Message.playerWin);
     } else if (dealerScore > playerScore) {
       setMessage(Message.dealerWin);
