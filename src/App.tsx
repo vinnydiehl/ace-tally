@@ -25,7 +25,7 @@ export default function App() {
   const [deck, setDeck] = useState(newDeck(DECKS));
   const [discarded, setDiscarded] = useState(0);
 
-  const [holeCard, setHoleCard] = useState<string>("");
+  let [holeCard, setHoleCard] = useState<string>("");
   const [dealerHand, setDealerHand] = useState<string[]>([]);
   const [hand, setHand] = useState<string[]>([]);
 
@@ -74,8 +74,8 @@ export default function App() {
       setDealerHand(dealerHand);
       break;
      case DealTo.hole:
-      holeCard.replace(holeCard, card);
-      setHoleCard(card);
+      holeCard = card;
+      setHoleCard(holeCard);
       break;
     }
   }
