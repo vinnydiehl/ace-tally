@@ -54,11 +54,11 @@ export default function App() {
     return deck;
   }
 
-  function dealCard(dealTo: DealTo) {
+  function dealCard(dealTo: DealTo): boolean {
     if (deck.length < 1) {
       alert("All cards have been drawn; shuffling.");
       shuffle();
-      return;
+      return false;
     }
 
     const card = deck.splice(0, 1)[0];
@@ -78,6 +78,8 @@ export default function App() {
       setHoleCard(holeCard);
       break;
     }
+
+    return true;
   }
 
   function clearTable() {
@@ -96,7 +98,8 @@ export default function App() {
   }
 
   function shuffle() {
-    setDeck(newDeck(DECKS));
+    deck.splice(0, deck.length, ...newDeck(DECKS));
+    setDeck(deck);
     newHand();
     // Dealing a new hand clears the table, but we still need to clear the
     // discard tray
@@ -108,10 +111,10 @@ export default function App() {
     setPlayerTurn(true);
     clearTable();
 
-    dealCard(DealTo.dealer);
-    dealCard(DealTo.hole);
-    dealCard(DealTo.player);
-    dealCard(DealTo.player);
+    dealCard(DealTo.dealer) &&
+      dealCard(DealTo.hole) &&
+      dealCard(DealTo.player) &&
+      dealCard(DealTo.player);
 
     if (score(hand).value == 21) {
       // Player blackjack
