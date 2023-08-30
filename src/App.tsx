@@ -33,17 +33,11 @@ export default function App() {
   const [message, setMessage] = useState(Message.none);
 
   function newDeck(decks: number): string[] {
-    const values = "23456789XJQKA";
-    const suits = "SDCH";
-
-    const deck: string[] = [];
-    for (let i = 0; i < decks; ++i) {
-      for (const suit of suits) {
-        for (const value of values) {
-          deck.push(value + suit);
-        }
-      }
-    }
+    const deck = [...Array(decks)].flatMap(_ => {
+      return [..."SDCH"].flatMap(suit => {
+        return [..."23456789XJQKA"].map(rank => rank + suit);
+      });
+    });
 
     // Shuffle using the Fisher-Yates algorithm
     for (let i = deck.length - 1; i > 0; --i) {
